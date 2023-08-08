@@ -11,32 +11,45 @@ datasource db {
 }
 
 model Product {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  category String // tea
-  price Float @default(0.00)
-  unit Int @default(0)
-  qantity Int @default(0)
-  // image String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  netWeight Int
+  price     Float
+  quantity  Int
+  imgUrl    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // one-to-many relactions: Category <-> Product
+  categoryRelation Category @relation(fields: [category], references: [name])
+  category         String
+
   // many-to-many relactions: Product <-> Order
+  orders   Order[]  @relation("ProductsInOrder", fields: [orderIds], references: [id])
   orderIds String[] @db.ObjectId
-  orders Order[] @relation(fields: [orderIds], references: [id])
+}
+
+model Category {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // one-to-many relactions: Category <-> Product
+  products Product[]
 }
 
 model Order {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  username String
-  phone String
-  address String
-  amount Float @default(0.00)
-  status String @default("accepted") // accepted, shipped, complete, cancelled
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String
+  phone     String
+  address   String
+  amount    Float    @default(0.00)
+  status    String   @default("accepted") // accepted, shipped, complete, cancelled
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // many-to-many relactions: Product <-> Order
-  productIds String[] @db.ObjectId
-  products Product[] @relation(fields: [productIds], references: [id])
+  products   Product[] @relation("ProductsInOrder", fields: [productIds], references: [id])
+  productIds String[]  @db.ObjectId
 }

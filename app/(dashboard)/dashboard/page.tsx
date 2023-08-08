@@ -1,3 +1,3 @@
 export default function Overview() {
-  return <>Overview</>;
+  return <>Coming Soon...</>;
 }
