@@ -15,7 +15,7 @@ export default async function Category({
   const isEdit = params.categoryId !== "new";
   let category: Category | null = null;
 
-  if (params.categoryId !== "new") {
+  if (isEdit) {
     category = await getCategory(params.categoryId);
     if (!category) notFound();
   }

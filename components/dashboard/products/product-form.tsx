@@ -2,18 +2,25 @@
 
 import { MouseEvent, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Category, Product } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { Category, Product } from "@prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { Check, ChevronsUpDown, PencilLine } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
-import { routes } from "@/lib/constants";
-import { cn } from "@/lib/utils";
-import { ProductFormSchemaType, productFormSchema } from "@/lib/zObject";
+import { createProduct } from "@/actions/product/createProduct";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ImageUpload } from "@/components/dashboard/products/image-upload";
 import { Input } from "@/components/ui/input";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -23,41 +30,72 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import { CategoryModal } from "@/components/dashboard/products/category-modal";
+
+import { routes } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+import { ProductFormSchemaType, productFormSchema } from "@/lib/zObject";
 
 export interface ProductFormProps {
   existingProduct: Product | null;
   categories: Category[] | null;
-  isEdit: boolean;
+}
+
+function transformIncomingData(data: Product | null) {
+  if (!data) return { images: [] };
+  let newData = {
+    ...data,
+    images: data.imageUrls
+      ? data.imageUrls.map((url) => {
+          return { url };
+        })
+      : [],
+  };
+  // delete newData.imageUrls;
+  return newData;
+}
+
+// object index signature type
+type FormatDataType = {
+  [key: string]: string | Blob;
+};
+
+function transformOutgoingData(data: ProductFormSchemaType) {
+  const formatData: FormatDataType = {
+    name: data.name,
+    category: data.category,
+    netWeight: data.netWeight.toString(),
+    price: data.price.toString(),
+    quantity: data.quantity.toString(),
+    isArchived: data.isArchived ? "true" : "false",
+  };
+
+  data.images.forEach((file, index: number) => {
+    formatData["file" + (index + 1)] = file.file;
+    formatData["url" + (index + 1)] = file.url;
+  });
+
+  const formData = new FormData();
+  for (const [key, value] of Object.entries(formatData)) {
+    formData.append(key, value);
+  }
+
+  return formData;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
   existingProduct,
   categories,
-  isEdit,
 }) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  const defaultValues = existingProduct
-    ? {
-        ...existingProduct,
-      }
-    : {};
+  const defaultValues = transformIncomingData(existingProduct);
 
   const form = useForm<ProductFormSchemaType>({
     resolver: zodResolver(productFormSchema),
@@ -65,20 +103,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
   });
 
   async function onSubmit(data: ProductFormSchemaType) {
-    console.log(data);
+    const formData = transformOutgoingData(data);
+
     try {
       setLoading(true);
-      // if (isEdit) {
-      //   const product = await createProduct();
-      //   toast.success(`${product.name} is updated.`);
-      // } else {
-      //   const product = await createProduct();
-      //   router.push(routes.products.pathname);
-      //   toast.success(`${product.name} is created.`);
-      // }
+      if (existingProduct) {
+        // const product = await updateCategory();
+        // toast.success(`${product.name} is updated`);
+      } else {
+        const product = await createProduct(formData);
+        // toast.success(`${product.name} is created`);
+      }
     } catch (error) {
-      toast.error("Something went wrong.");
+      console.log("product form submit error", error);
+      toast.error("Something went wrong");
     } finally {
+      //   router.push(routes.products.pathname);
       setLoading(false);
     }
   }
@@ -95,6 +135,31 @@ const ProductForm: React.FC<ProductFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
+          <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ImageUpload
+                    currentFiles={field.value}
+                    disabled={loading}
+                    onAdd={(files: ImageObjectType[]) =>
+                      field.onChange([...field.value, ...files])
+                    }
+                    onRemove={(file: ImageObjectType) =>
+                      field.onChange([
+                        ...field.value.filter(
+                          (current) => current.url !== file.url
+                        ),
+                      ])
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="space-y-6 md:space-y-0 md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -175,27 +240,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center gap-2">
-                      $
-                      <Input
-                        type="number"
-                        disabled={loading}
-                        placeholder="9.99"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="netWeight"
               render={({ field }) => (
                 <FormItem>
@@ -209,6 +253,27 @@ const ProductForm: React.FC<ProductFormProps> = ({
                         {...field}
                       />
                       g
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-2">
+                      $
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="9.99"
+                        {...field}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -254,33 +319,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
-          {/* <FormField
-            control={form.control}
-            name="images"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Images</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value.map((image) => image.url)}
-                    disabled={loading}
-                    onChange={(url) =>
-                      field.onChange([...field.value, { url }])
-                    }
-                    onRemove={(url) =>
-                      field.onChange([
-                        ...field.value.filter((current) => current.url !== url),
-                      ])
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
           <div className="flex gap-2">
             <Button disabled={loading} variant={"shucha"} type="submit">
-              {isEdit ? "Save" : "Create"}
+              {existingProduct ? "Save" : "Create"}
             </Button>
             <Button disabled={loading} variant={"outline"} onClick={onCancel}>
               Cnacel

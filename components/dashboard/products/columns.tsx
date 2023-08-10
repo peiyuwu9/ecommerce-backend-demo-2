@@ -10,17 +10,17 @@ export const columns: ColumnDef<Product>[] = [
     header: "Name",
   },
   {
-    accessorKey: "netWeight",
-    header: () => <div className="text-center">Net Weight</div>,
-    cell: ({ row }) => (
-      <div className="text-center">{row.original.netWeight} g</div>
-    ),
-  },
-  {
     accessorKey: "category",
     header: () => <div className="text-center">Category</div>,
     cell: ({ row }) => (
       <div className="text-center">{row.original.category}</div>
+    ),
+  },
+  {
+    accessorKey: "netWeight",
+    header: () => <div className="text-center">Net Weight</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.netWeight} g</div>
     ),
   },
   {

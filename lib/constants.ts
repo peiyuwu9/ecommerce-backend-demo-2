@@ -40,12 +40,15 @@ export const routes = {
 
 export const productFormErrorMsg = {
   name: "Please enter product name",
+  images: "Please upload at least one image",
   category: "Please select one category",
-  price: "Please set a price",
   netWeight: "Please enter net weight",
+  price: "Please set a price",
   quantity: "Please enter quantities",
 };
 
 export const categoryFormErrorMsg = {
   name: "Please enter product name",
 };
+
+export const MAX_IMAGE_UPLOAD = 3;

@@ -12,7 +12,7 @@ export const dollarFormatter = new Intl.NumberFormat("en-US", {
 
 export const dateFormatter = new Intl.DateTimeFormat("en-US");
 
-export async function imgProcessor(file: File) {
+export async function imageProcessor(file: File) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   // Maybe use npm sharp to resize image: https://www.npmjs.com/package/sharp

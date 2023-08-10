@@ -1,4 +1,5 @@
 import { Category, Product } from "@prisma/client";
+import { notFound } from "next/navigation";
 
 import { getCategories } from "@/actions/category/gatCategoryies";
 
@@ -17,34 +18,33 @@ export default async function Product({
 }: {
   params: { productId: string };
 }) {
+  const isEdit = params.productId !== "new";
   let data: Data = {
     product: null,
     categories: null,
   };
 
-  if (params.productId === "new") {
-    const categories = await getCategories();
-    data.product = null;
-    data.categories = categories;
-  } else {
+  if (isEdit) {
     const res = await Promise.all([
       getProduct(params.productId),
       getCategories(),
     ]);
+    if (!res[0]) notFound();
     data.product = res[0];
     data.categories = res[1];
+  } else {
+    const categories = await getCategories();
+    data.product = null;
+    data.categories = categories;
   }
 
   return (
     <>
-      <Heading
-        title={`${params.productId === "new" ? "New Product" : "Edit Product"}`}
-      ></Heading>
+      <Heading title={`${isEdit ? "Edit Product" : "New Product"}`}></Heading>
       <Separator />
       <ProductForm
         existingProduct={data.product}
         categories={data.categories}
-        isEdit={false}
       />
     </>
   );

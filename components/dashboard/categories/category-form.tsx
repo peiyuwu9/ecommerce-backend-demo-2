@@ -3,10 +3,10 @@
 import { MouseEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { Category } from "@prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { Trash2 } from "lucide-react";
-import { Category } from "@prisma/client";
 
 import { createCategory } from "@/actions/category/createCategory";
 import { updateCategory } from "@/actions/category/updateCategory";
