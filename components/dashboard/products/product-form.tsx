@@ -112,13 +112,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
         // toast.success(`${product.name} is updated`);
       } else {
         const product = await createProduct(formData);
-        // toast.success(`${product.name} is created`);
+        toast.success(`${product.name} is created`);
       }
+      router.refresh();
     } catch (error) {
       console.log("product form submit error", error);
       toast.error("Something went wrong");
     } finally {
-      //   router.push(routes.products.pathname);
+      router.push(routes.products.pathname);
       setLoading(false);
     }
   }

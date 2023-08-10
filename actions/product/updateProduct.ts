@@ -87,6 +87,6 @@ export async function createProduct(formData: FormData) {
     return product;
   } catch (error) {
     console.log("[createProduct]", error);
-    return null;
+    throw error;
   }
 }

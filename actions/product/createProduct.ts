@@ -6,7 +6,6 @@ import { imageProcessor } from "@/lib/utils";
 
 export async function createProduct(formData: FormData) {
   try {
-    console.log("formData", formData);
     // Prepare data for database
     const data = {
       name: formData.get("name") as string,
@@ -87,6 +86,6 @@ export async function createProduct(formData: FormData) {
     return product;
   } catch (error) {
     console.log("[createProduct]", error);
-    return null;
+    throw error;
   }
 }

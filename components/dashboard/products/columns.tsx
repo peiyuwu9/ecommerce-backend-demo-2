@@ -1,10 +1,22 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Product } from "@prisma/client";
 import { dollarFormatter } from "@/lib/utils";
+import { Archive } from "lucide-react";
+import { RowActions } from "./row-actions";
 
-export const columns: ColumnDef<Product>[] = [
+export interface ProductColumnType {
+  id: string;
+  name: string;
+  category: string;
+  netWeight: number;
+  price: number;
+  quantity: number;
+  isArchived: boolean;
+  createdAt: Date;
+}
+
+export const columns: ColumnDef<ProductColumnType>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -42,5 +54,14 @@ export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "isArchived",
     header: () => <div className="text-center">Archived</div>,
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        {row.original.isArchived && <Archive className="text-brand-disable" />}
+      </div>
+    ),
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <RowActions data={row.original} />,
   },
 ];

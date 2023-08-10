@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 
 export interface AlertModalProps {
+  title: string;
+  description: string;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -13,6 +15,8 @@ export interface AlertModalProps {
 }
 
 const AlertModal: React.FC<AlertModalProps> = ({
+  title,
+  description,
   isOpen,
   onClose,
   onConfirm,
@@ -24,8 +28,8 @@ const AlertModal: React.FC<AlertModalProps> = ({
 
   return (
     <Modal
-      title="Delete Category"
-      description="Are you sure you want to delete this category?"
+      title={title}
+      description={description}
       isOpen={isOpen}
       onClose={onClose}
     >

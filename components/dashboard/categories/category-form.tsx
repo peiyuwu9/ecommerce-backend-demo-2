@@ -88,6 +88,8 @@ const CategoryForm: React.FC<ProductFormProps> = ({ existingCategory }) => {
   return (
     <>
       <AlertModal
+        title={"Delete Category"}
+        description={"Are you sure you want to delete this category?"}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={onDelete}
@@ -99,7 +101,7 @@ const CategoryForm: React.FC<ProductFormProps> = ({ existingCategory }) => {
           className="fixed right-6 h-6 w-6 p-0 md:h-10 md:w-10"
           onClick={() => setIsOpen(true)}
         >
-          <Trash2 className="text-brand-warning md:h-7 md:w-7" />
+          <Trash2 className="text-destructive md:h-7 md:w-7" />
         </Button>
       )}
       <Form {...form}>

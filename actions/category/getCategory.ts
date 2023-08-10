@@ -9,6 +9,6 @@ export async function getCategory(id: string) {
     return category;
   } catch (error) {
     console.log("[getCategory]", error);
-    return null;
+    throw error;
   }
 }

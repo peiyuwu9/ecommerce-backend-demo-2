@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MoreVertical, PencilLine, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { CategoryColumnType } from "./columns";
+import { ProductColumnType } from "./columns";
 
-import { deleteCategory } from "@/actions/category/deleteCategory";
+import { deleteProduct } from "@/actions/product/deleteProduct";
 
 import { Button } from "@/components/ui/button";
 import { AlertModal } from "@/components/ui/alert-modal";
@@ -20,7 +20,7 @@ import {
 import { routes } from "@/lib/constants";
 
 export interface RowActionsProps {
-  data: CategoryColumnType;
+  data: ProductColumnType;
 }
 
 const RowActions: React.FC<RowActionsProps> = ({ data }) => {
@@ -32,12 +32,12 @@ const RowActions: React.FC<RowActionsProps> = ({ data }) => {
     try {
       setLoading(true);
       if (data) {
-        const category = await deleteCategory(data.id);
-        toast.success(`${category.name} is deleted`);
+        const product = await deleteProduct(data.id);
+        toast.success(`${product.name} is deleted`);
       }
       router.refresh();
     } catch (error) {
-      console.log("category delete error", error);
+      console.log("product delete error", error);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
@@ -48,8 +48,8 @@ const RowActions: React.FC<RowActionsProps> = ({ data }) => {
   return (
     <>
       <AlertModal
-        title={"Delete Category"}
-        description={"Are you sure you want to delete this category?"}
+        title={"Delete Product"}
+        description={"Are you sure you want to delete this product?"}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={onDelete}
@@ -66,7 +66,7 @@ const RowActions: React.FC<RowActionsProps> = ({ data }) => {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() =>
-                router.push(`${routes.categories.pathname}/${data.id}`)
+                router.push(`${routes.products.pathname}/${data.id}`)
               }
             >
               <PencilLine className="mr-2 h-4 w-4" /> Edit

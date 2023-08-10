@@ -55,7 +55,7 @@ module.exports = {
           dark: "#70615e",
           background: "#c3b49b",
           turquoise: "#94a69e",
-          warning: "#ef4444",
+          disable: "#64748b"
         },
       },
       borderRadius: {

@@ -1,21 +1,18 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
+import { getProducts } from "@/actions/product/gatProducts";
+
 import { columns } from "@/components/dashboard/products/columns";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/ui/data-table";
 
-import prismaDb from "@/lib/prismaDb";
 import { routes } from "@/lib/constants";
 
 export default async function Products() {
-  const products = await prismaDb.product.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const products = await getProducts();
 
   return (
     <>

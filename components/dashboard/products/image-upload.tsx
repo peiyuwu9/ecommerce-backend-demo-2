@@ -99,7 +99,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             className="h-32 w-32 relative flex items-center justify-center border rounded-md shadow-sm"
           >
             <XCircle
-              className="h-5 w-5 absolute top-1 right-1 text-destructive z-10"
+              className="h-5 w-5 absolute top-0 right-0 text-destructive z-10 bg-white border-white border-2 rounded-full"
               onClick={() => handleRemove(index)}
             />
             <div className="h-28 w-28 relative">
