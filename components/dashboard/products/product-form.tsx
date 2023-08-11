@@ -7,8 +7,10 @@ import { Category, Product } from "@prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { Check, ChevronsUpDown } from "lucide-react";
+import deepEqual from "deep-equal";
 
 import { createProduct } from "@/actions/product/createProduct";
+import { updateProduct } from "@/actions/product/updateProduct";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -64,22 +66,49 @@ type FormatDataType = {
   [key: string]: string | Blob;
 };
 
-function transformOutgoingData(data: ProductFormSchemaType) {
-  const formatData: FormatDataType = {
-    name: data.name,
-    category: data.category,
-    netWeight: data.netWeight.toString(),
-    price: data.price.toString(),
-    quantity: data.quantity.toString(),
-    isArchived: data.isArchived ? "true" : "false",
-  };
-
-  data.images.forEach((file, index: number) => {
-    formatData["file" + (index + 1)] = file.file;
-    formatData["url" + (index + 1)] = file.url;
-  });
-
+function transformOutgoingData(
+  existingProduct: Product | null,
+  existingImages: ImageObjectType[] | null,
+  data: ProductFormSchemaType
+) {
   const formData = new FormData();
+  let formatData: FormatDataType = {};
+
+  if (existingProduct) {
+    if (data.name !== existingProduct.name) formatData.name = data.name;
+    if (data.category !== existingProduct.category)
+      formatData.category = data.category;
+    if (data.netWeight !== existingProduct.netWeight)
+      formatData.netWeight = data.netWeight.toString();
+    if (data.price !== existingProduct.price)
+      formatData.price = data.price.toString();
+    if (data.quantity !== existingProduct.quantity)
+      formatData.quantity = data.quantity.toString();
+    if (data.isArchived !== existingProduct.isArchived)
+      formatData.isArchived = data.isArchived ? "true" : "false";
+
+    if (!deepEqual(existingImages, data.images)) {
+      data.images.forEach((file, index: number) => {
+        if (file.file) formatData["file" + (index + 1)] = file.file;
+        formatData["url" + (index + 1)] = file.url;
+      });
+    }
+  } else {
+    formatData = {
+      name: data.name,
+      category: data.category,
+      netWeight: data.netWeight.toString(),
+      price: data.price.toString(),
+      quantity: data.quantity.toString(),
+      isArchived: data.isArchived ? "true" : "false",
+    };
+
+    data.images.forEach((file, index: number) => {
+      if (file.file) formatData["file" + (index + 1)] = file.file;
+      formatData["url" + (index + 1)] = file.url;
+    });
+  }
+
   for (const [key, value] of Object.entries(formatData)) {
     formData.append(key, value);
   }
@@ -103,14 +132,23 @@ const ProductForm: React.FC<ProductFormProps> = ({
   });
 
   async function onSubmit(data: ProductFormSchemaType) {
-    const formData = transformOutgoingData(data);
-
     try {
       setLoading(true);
       if (existingProduct) {
-        // const product = await updateCategory();
-        // toast.success(`${product.name} is updated`);
+        let product = existingProduct;
+        const formData = transformOutgoingData(
+          existingProduct,
+          defaultValues.images,
+          data
+        );
+        // If there is no entry in formData, formData.entries().next().done will return true
+        // Otherwise, if there is data in formData, it will return false
+        if (!formData.entries().next().done) {
+          product = await updateProduct(existingProduct.id, formData);
+        }
+        toast.success(`${product.name} is updated`);
       } else {
+        const formData = transformOutgoingData(null, null, data);
         const product = await createProduct(formData);
         toast.success(`${product.name} is created`);
       }
@@ -213,8 +251,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                 key={category.id}
                                 disabled={loading}
                                 onSelect={(itemValue) => {
+                                  const capitalizedValue =
+                                    itemValue[0].toUpperCase() +
+                                    itemValue.substring(1);
                                   field.onChange(
-                                    itemValue === field.value ? "" : itemValue
+                                    capitalizedValue === field.value
+                                      ? ""
+                                      : capitalizedValue
                                   );
                                   setOpen(false);
                                 }}

@@ -47,7 +47,10 @@ const CategoryForm: React.FC<ProductFormProps> = ({ existingCategory }) => {
     try {
       setLoading(true);
       if (existingCategory) {
-        const category = await updateCategory(existingCategory.id, data.name);
+        let category = existingCategory;
+        if (data.name !== existingCategory.name) {
+          category = await updateCategory(existingCategory.id, data.name);
+        }
         toast.success(`${category.name} is updated`);
       } else {
         const category = await createCategory(data.name);

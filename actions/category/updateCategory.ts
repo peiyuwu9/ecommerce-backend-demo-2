@@ -7,8 +7,8 @@ export async function updateCategory(id: string, name: string) {
     if (!name) throw new Error("Missing name");
 
     const category = await prismaDb.category.update({
-      data: { name },
       where: { id },
+      data: { name },
     });
 
     return category;

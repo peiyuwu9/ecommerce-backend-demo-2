@@ -103,7 +103,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               onClick={() => handleRemove(index)}
             />
             <div className="h-28 w-28 relative">
-              <Image src={file.url} alt={file.url} fill={true} />
+              <Image
+                src={file.url}
+                alt={file.url}
+                priority={true}
+                fill={true}
+                sizes="width: 7rem"
+              />
             </div>
           </div>
         ))}

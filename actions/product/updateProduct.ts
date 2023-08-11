@@ -4,18 +4,40 @@ import { imageUploader } from "@/lib/cloudflare";
 import prismaDb from "@/lib/prismaDb";
 import { imageProcessor } from "@/lib/utils";
 
-export async function createProduct(formData: FormData) {
+type DataType = {
+  [key: string]: string | number | boolean | string[];
+};
+
+export async function updateProduct(id: string, formData: FormData) {
   try {
-    console.log("formData", formData);
     // Prepare data for database
-    const data = {
-      name: formData.get("name") as string,
-      category: formData.get("category") as string,
-      netWeight: parseInt(formData.get("netWeight") as string),
-      price: parseFloat(formData.get("price") as string),
-      quantity: parseInt(formData.get("quantity") as string),
-      isArchived: (formData.get("isArchived") as string) === "true",
-    };
+    const data: DataType = {};
+    for (const key of formData.keys()) {
+      if (key === "name") {
+        data.name = formData.get(key) as string;
+        continue;
+      }
+      if (key === "category") {
+        data.category = formData.get(key) as string;
+        continue;
+      }
+      if (key === "netWeight") {
+        data.netWeight = parseInt(formData.get(key) as string);
+        continue;
+      }
+      if (key === "price") {
+        data.price = parseFloat(formData.get(key) as string);
+        continue;
+      }
+      if (key === "quantity") {
+        data.quantity = parseInt(formData.get(key) as string);
+        continue;
+      }
+      if (key === "isArchived") {
+        data.isArchived = (formData.get(key) as string) === "true";
+        continue;
+      }
+    }
 
     // Prepare files for cloudflare
     const files = [];
@@ -41,52 +63,31 @@ export async function createProduct(formData: FormData) {
       }
     }
 
-    // Check missing data
-    let missingInformation: string[] = [];
-    for (const [key, value] of Object.entries(data)) {
-      if (key === "name" && !value) {
-        missingInformation.push("name");
-        continue;
-      }
-      if (key === "catagory" && !value) {
-        missingInformation.push("category");
-        continue;
-      }
-      if (key === "netWeight" && typeof value === "number" && isNaN(value)) {
-        missingInformation.push("net weight");
-        continue;
-      }
-      if (key === "price" && typeof value === "number" && isNaN(value)) {
-        missingInformation.push("price");
-        continue;
-      }
-      if (key === "quantity" && typeof value === "number" && isNaN(value)) {
-        missingInformation.push("quantity");
-        continue;
-      }
-      if (files.length === 0) {
-        missingInformation.push("image");
-        continue;
-      }
+    const filesNeedUpload = files.filter((file) => file.has("file"));
+    const filesNoNeedUpload = files.filter((file) => !file.has("file"));
+
+    // Prepare image urls
+    if (filesNeedUpload.length > 0) {
+      // Upload images to Cloudflare
+      const imageUrls = await imageUploader(id, filesNeedUpload);
+      filesNeedUpload.forEach((file, index) => {
+        if (!data.imageUrls) data.imageUrls = [];
+        if (Array.isArray(data.imageUrls))
+          data.imageUrls[file.get("index") as number] = imageUrls[index];
+      });
     }
-    if (missingInformation.length > 0)
-      throw new Error(`Missing ${missingInformation.join(", ")} information`);
 
-    // Create product to get id
-    const preProduct = await prismaDb.product.create({ data });
-
-    // Upload images to Cloudflare
-    const imageUrls = await imageUploader(preProduct.id, files);
-
-    // Update image urls
-    const product = await prismaDb.product.update({
-      where: { id: preProduct.id },
-      data: { imageUrls },
+    filesNoNeedUpload.forEach((file) => {
+      if (!data.imageUrls) data.imageUrls = [];
+      if (Array.isArray(data.imageUrls))
+        data.imageUrls[file.get("index") as number] = file.get("url");
     });
+
+    const product = await prismaDb.product.update({ where: { id }, data });
 
     return product;
   } catch (error) {
-    console.log("[createProduct]", error);
+    console.log("[updateProduct]", error);
     throw error;
   }
 }

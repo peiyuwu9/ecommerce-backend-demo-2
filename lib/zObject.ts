@@ -9,7 +9,7 @@ export const productFormSchema = z.object({
     .min(1, { message: productFormErrorMsg.name }),
   images: z
     .object({
-      file: z.instanceof(Blob),
+      file: z.instanceof(Blob).optional(),
       url: z.string(),
     })
     .array()

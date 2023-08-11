@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
+    "deep-equal": "^2.2.2",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.12",
     "lucide-react": "^0.263.0",
@@ -46,6 +47,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/deep-equal": "^1.0.1",
     "prisma": "^5.0.0"
   }
 }
