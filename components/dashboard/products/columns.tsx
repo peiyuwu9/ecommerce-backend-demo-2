@@ -32,7 +32,7 @@ export const columns: ColumnDef<ProductColumnType>[] = [
     accessorKey: "netWeight",
     header: () => <div className="text-center">Net Weight</div>,
     cell: ({ row }) => (
-      <div className="text-center">{row.original.netWeight} g</div>
+      <div className="text-center">{row.original.netWeight}g</div>
     ),
   },
   {

@@ -5,7 +5,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 import { routes } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-import { BarChartBig, Eye, Leaf, List, Settings } from "lucide-react";
+import { BarChartBig, Eye, Leaf, List, ScrollText } from "lucide-react";
 
 const Tabs = () => {
   const segment = useSelectedLayoutSegment();
@@ -25,8 +25,8 @@ const Tabs = () => {
       case routes.categories.name:
         icon = <List className="tab-icons" />;
         break;
-      case routes.settings.name:
-        icon = <Settings className="tab-icons" />;
+      case routes.orders.name:
+        icon = <ScrollText className="tab-icons" />;
         break;
       case routes.analytics.name:
         icon = <BarChartBig className="tab-icons" />;

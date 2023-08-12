@@ -5,7 +5,7 @@ const NavbarItems = () => {
   return (
     <>
       <span className="text-4xl font-bold text-brand-dark">Dashboard</span>
-      <UserButton afterSignOutUrl={routes.root.pathname} />
+      <UserButton afterSignOutUrl={routes.signin.pathname} />
     </>
   );
 };

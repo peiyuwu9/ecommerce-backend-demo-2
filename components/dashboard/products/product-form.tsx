@@ -8,10 +8,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { Check, ChevronsUpDown } from "lucide-react";
 import deepEqual from "deep-equal";
+import { Trash2 } from "lucide-react";
 
 import { createProduct } from "@/actions/product/createProduct";
 import { updateProduct } from "@/actions/product/updateProduct";
+import { deleteProduct } from "@/actions/product/deleteProduct";
 
+import { AlertModal } from "@/components/ui/alert-modal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUpload } from "@/components/dashboard/products/image-upload";
@@ -121,7 +124,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   categories,
 }) => {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [isCategoryPopoverOpen, setIsCategoryPopoverOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const defaultValues = transformIncomingData(existingProduct);
@@ -162,6 +166,23 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   }
 
+  async function onDelete() {
+    try {
+      setLoading(true);
+      if (existingProduct) {
+        const category = await deleteProduct(existingProduct.id);
+        toast.success(`${category.name} is updated`);
+      }
+      router.refresh();
+    } catch (error) {
+      console.log("category delete error", error);
+      toast.error("Something went wrong");
+    } finally {
+      router.push(routes.categories.pathname);
+      setLoading(false);
+    }
+  }
+
   function onCancel(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     router.push(routes.products.pathname);
@@ -169,6 +190,23 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   return (
     <>
+      <AlertModal
+        title={"Delete Product"}
+        description={"Are you sure you want to delete this product?"}
+        isOpen={isAlertModalOpen}
+        onClose={() => setIsAlertModalOpen(false)}
+        onConfirm={onDelete}
+        loading={loading}
+      />
+      {existingProduct && (
+        <Button
+          variant={"ghost"}
+          className="fixed right-6 h-6 w-6 p-0 md:h-10 md:w-10"
+          onClick={() => setIsAlertModalOpen(true)}
+        >
+          <Trash2 className="text-destructive md:h-7 md:w-7" />
+        </Button>
+      )}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -223,13 +261,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover
+                    open={isCategoryPopoverOpen}
+                    onOpenChange={setIsCategoryPopoverOpen}
+                  >
                     <FormControl>
                       <PopoverTrigger asChild>
                         <Button
                           variant={"combobox"}
                           role="combobox"
-                          aria-expanded={open}
+                          aria-expanded={isCategoryPopoverOpen}
                           className={cn(
                             `w-full justify-between`,
                             field.value || "text-muted-foreground"
@@ -259,7 +300,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                       ? ""
                                       : capitalizedValue
                                   );
-                                  setOpen(false);
+                                  setIsCategoryPopoverOpen(false);
                                 }}
                               >
                                 <Check

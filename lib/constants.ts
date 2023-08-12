@@ -1,39 +1,43 @@
 export const routes = {
-  root: {
-    name: "root",
-    pathname: "/",
+  signin: {
+    name: "Signin",
+    pathname: "/sing-in",
+  },
+  signup: {
+    name: "Signup",
+    pathname: "/sing-up",
   },
   overview: {
     name: "Overview",
-    pathname: "/dashboard",
+    pathname: "/",
     label: "dashboard-nav",
   },
   products: {
     name: "Products",
-    pathname: "/dashboard/products",
+    pathname: "/products",
     label: "dashboard-nav",
   },
   newProduct: {
     name: "New Product",
-    pathname: "/dashboard/products/new",
+    pathname: "/products/new",
   },
   categories: {
     name: "Categories",
-    pathname: "/dashboard/categories",
+    pathname: "/categories",
     label: "dashboard-nav",
   },
   newCategory: {
     name: "New Category",
-    pathname: "/dashboard/categories/new",
+    pathname: "/categories/new",
+  },
+  orders: {
+    name: "Orders",
+    pathname: "/orders",
+    label: "dashboard-nav",
   },
   analytics: {
     name: "Analytics",
-    pathname: "/dashboard/analytics",
-    label: "dashboard-nav",
-  },
-  settings: {
-    name: "Settings",
-    pathname: "/dashboard/settings",
+    pathname: "/analytics",
     label: "dashboard-nav",
   },
 };
