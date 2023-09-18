@@ -6,7 +6,7 @@ import { getOrder } from "@/actions/order/getOrder";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 
-import { dateFormatter } from "@/lib/utils";
+import { cn, dateFormatter } from "@/lib/utils";
 
 export default async function Order({
   params,
@@ -21,15 +21,23 @@ export default async function Order({
 
   return (
     <>
-      <Heading title={`Order#${order.id}`}></Heading>
+      <Heading title={`Order#${order.id}`}>
+        <p
+          className={`${cn(
+            "text-2xl",
+            order.status === "Accepted" && "text-red-500"
+          )}`}
+        >
+          {order.status}
+        </p>
+      </Heading>
       <Separator />
-      <p>{dateFormatter.format(order.createdAt)}</p>
-      <p>{order.username}</p>
-      <p>{order.phone}</p>
-      <p>{order.address}</p>
+      <p>Order Date: {dateFormatter.format(order.createdAt)}</p>
+      <p>Name: {order.username}</p>
+      <p>Phone Number: {order.phone}</p>
+      <p>Address: {order.address}</p>
       <p>{order.productIds}</p>
-      <p>{order.amount}</p>
-      <p>{order.status}</p>
+      <p>Total: {order.amount}</p>
     </>
   );
 }

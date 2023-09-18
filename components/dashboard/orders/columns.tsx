@@ -16,6 +16,11 @@ const columns: ColumnDef<OrderColumnType>[] = [
     header: "Order Number",
   },
   {
+    accessorKey: "status",
+    header: () => <div className="text-center">Status</div>,
+    cell: ({ row }) => <div className="text-center">{row.original.status}</div>,
+  },
+  {
     accessorKey: "createdAt",
     header: () => <div className="text-center">Create Date</div>,
     cell: ({ row }) => (

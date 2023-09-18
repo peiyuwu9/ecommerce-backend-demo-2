@@ -46,7 +46,7 @@ model Order {
   phone     String
   address   String
   amount    Float    @default(0.00)
-  status    String   @default("accepted") // accepted, shipped, complete, cancelled
+  status    String   @default("Accepted") // Accepted, Shipped, Complete, Cancelled
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

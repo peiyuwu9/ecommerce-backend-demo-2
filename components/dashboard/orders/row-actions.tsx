@@ -33,7 +33,7 @@ const RowActions: React.FC<RowActionsProps> = ({ data }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuItem
             onClick={() =>
-              router.push(`${routes.categories.pathname}/${data.id}`)
+              router.push(`${routes.orders.pathname}/${data.id}`)
             }
           >
             <GanttChartSquare className="mr-2 h-4 w-4" /> Detail
